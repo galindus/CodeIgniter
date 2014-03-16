@@ -723,9 +723,14 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 * @param	string	the limit clause
 	 * @return	string
 	 */
-	function _delete($table, $where = array(), $like = array(), $limit = FALSE)
+	function _delete($table, $where = array(), $like = array(), $limit = FALSE, $join = array())
 	{
 		$conditions = '';
+		$joins = '';
+
+		if (count($join) > 0){
+			$joins = "\n" . implode("\n", $join);
+		}
 
 		if (count($where) > 0 OR count($like) > 0)
 		{
@@ -741,7 +746,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 
 		$limit = ( ! $limit) ? '' : ' LIMIT '.$limit;
 
-		return "DELETE FROM ".$table.$conditions.$limit;
+		return "DELETE FROM ".$table.$joins.$conditions.$limit;
 	}
 
 	// --------------------------------------------------------------------

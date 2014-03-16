@@ -1520,8 +1520,7 @@ class CI_DB_active_record extends CI_DB_driver {
 	public function delete($table = '', $where = '', $limit = NULL, $reset_data = TRUE)
 	{
 		// Combine any cached components with the current statements
-		$this->_merge_cache();
-
+		$this->_merge_cache();		
 		if ($table == '')
 		{
 			if ( ! isset($this->ar_from[0]))
@@ -1539,7 +1538,7 @@ class CI_DB_active_record extends CI_DB_driver {
 		{
 			foreach ($table as $single_table)
 			{
-				$this->delete($single_table, $where, $limit, FALSE);
+				$this->delete($single_table, $where, $limit, FALSE, $this->ar_join);
 			}
 
 			$this->_reset_write();
@@ -1570,7 +1569,7 @@ class CI_DB_active_record extends CI_DB_driver {
 			return FALSE;
 		}
 
-		$sql = $this->_delete($table, $this->ar_where, $this->ar_like, $this->ar_limit);
+		$sql = $this->_delete($table, $this->ar_where, $this->ar_like, $this->ar_limit, $this->ar_join);
 
 		if ($reset_data)
 		{
