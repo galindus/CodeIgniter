@@ -640,9 +640,14 @@ class CI_DB_postgre_driver extends CI_DB {
 	{
 		$conditions = '';
 		$joins = '';
-
+		
 		if (count($join) > 0){
-			$joins = "\n" . implode("\n", $join);
+			foreach ($join as $deljoin) {				
+				// Use postgress syntax.
+				if(preg_match('/JOIN\s"(.+)"\sON/', $deljoin, $using) == 1){					
+					$joins .= "\nUSING " . $using[1] . "\n";
+				}
+			}
 		}
 
 		if (count($where) > 0 OR count($like) > 0)

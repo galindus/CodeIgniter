@@ -1520,7 +1520,8 @@ class CI_DB_active_record extends CI_DB_driver {
 	public function delete($table = '', $where = '', $limit = NULL, $reset_data = TRUE)
 	{
 		// Combine any cached components with the current statements
-		$this->_merge_cache();		
+		$this->_merge_cache();
+		
 		if ($table == '')
 		{
 			if ( ! isset($this->ar_from[0]))
@@ -2033,7 +2034,8 @@ class CI_DB_active_record extends CI_DB_driver {
 			'ar_orderby'	=> array(),
 			'ar_keys'		=> array(),
 			'ar_limit'		=> FALSE,
-			'ar_order'		=> FALSE
+			'ar_order'		=> FALSE,
+			'ar_join' => array(),
 		);
 
 		$this->_reset_run($ar_reset_items);
