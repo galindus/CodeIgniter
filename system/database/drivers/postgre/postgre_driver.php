@@ -641,14 +641,26 @@ class CI_DB_postgre_driver extends CI_DB {
 		$conditions = '';
 		$joins = '';
 		
-		if (count($join) > 0){
-			foreach ($join as $deljoin) {				
+		if (count($join) > 0)
+		{
+			foreach ($join as $deljoin) 
+			{				
 				// Use postgress syntax.
-				if(preg_match('/JOIN\s"(.+)"\sON/', $deljoin, $using) == 1){					
-					$joins .= "\nUSING " . $using[1] . "\n";
+				if(preg_match('/JOIN\s(.+)\sON\s(.+)=(.+)/', $deljoin, $matches) == 1)
+				{					
+					$joins .= "\nWHERE " . $matches[2] . " IN (SELECT " . $matches[3] . " FROM " . $matches[2]. "\n";
 				}
+
+				// Parse join conditions if any.
+				if (count($where) > 0 OR count($like) > 0)
+				{
+					$joinwheres = preg_grep('/' . $matches[2] . '\..+/', input)
+				}
+
 			}
 		}
+
+
 
 		if (count($where) > 0 OR count($like) > 0)
 		{
