@@ -577,6 +577,44 @@ class CI_DB_odbc_driver extends CI_DB {
 	function _delete($table, $where = array(), $like = array(), $limit = FALSE)
 	{
 		$conditions = '';
+		$joins = '';
+		
+		$conditions = '';
+		$joins = '';
+		
+		if (count($join) > 0)
+		{
+			foreach ($join as $deljoin) 
+			{				
+				// Use postgress syntax.
+				if(preg_match('/JOIN\s(.+)\sON\s(.+)=(.+)/', $deljoin, $matches) == 1)
+				{					
+					$joins .= "\nWHERE " . $matches[3] . " IN (SELECT " . $matches[2] . " FROM " . $matches[1]. "\n";
+				}
+				
+				// Parse join conditions if any.
+				if (count($where) > 0 OR count($like) > 0)
+				{					
+
+					$joinwhere = preg_grep('/' . $matches[1] . '\..+/', $where);
+					$where = array_diff($where, $joinwhere);
+					$joinlike = preg_grep('/' . $matches[1] . '\..+/', $like);
+					$like = array_diff($like, $joinlike);
+					
+					$joins .= "\nWHERE "; 
+					$joins .= implode("\n", $joinwhere) ;
+					
+					if (count($where) > 0 && count($like) > 0)
+					{
+						$joins .= " AND ";
+					}
+
+					$joins .= implode("\n", $joinlike) . ")";					
+				}
+
+			}
+		}
+
 
 		if (count($where) > 0 OR count($like) > 0)
 		{
@@ -591,8 +629,8 @@ class CI_DB_odbc_driver extends CI_DB {
 		}
 
 		$limit = ( ! $limit) ? '' : ' LIMIT '.$limit;
-
-		return "DELETE FROM ".$table.$conditions.$limit;
+		
+		return "DELETE FROM ".$table.$joins.$conditions.$limit;
 	}
 
 	// --------------------------------------------------------------------

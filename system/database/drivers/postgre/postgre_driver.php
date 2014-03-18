@@ -641,6 +641,9 @@ class CI_DB_postgre_driver extends CI_DB {
 		$conditions = '';
 		$joins = '';
 		
+		$conditions = '';
+		$joins = '';
+		
 		if (count($join) > 0)
 		{
 			foreach ($join as $deljoin) 
@@ -648,18 +651,31 @@ class CI_DB_postgre_driver extends CI_DB {
 				// Use postgress syntax.
 				if(preg_match('/JOIN\s(.+)\sON\s(.+)=(.+)/', $deljoin, $matches) == 1)
 				{					
-					$joins .= "\nWHERE " . $matches[2] . " IN (SELECT " . $matches[3] . " FROM " . $matches[2]. "\n";
+					$joins .= "\nWHERE " . $matches[3] . " IN (SELECT " . $matches[2] . " FROM " . $matches[1]. "\n";
 				}
-
+				
 				// Parse join conditions if any.
 				if (count($where) > 0 OR count($like) > 0)
-				{
-					$joinwheres = preg_grep('/' . $matches[2] . '\..+/', input)
+				{					
+
+					$joinwhere = preg_grep('/' . $matches[1] . '\..+/', $where);
+					$where = array_diff($where, $joinwhere);
+					$joinlike = preg_grep('/' . $matches[1] . '\..+/', $like);
+					$like = array_diff($like, $joinlike);
+					
+					$joins .= "\nWHERE "; 
+					$joins .= implode("\n", $joinwhere) ;
+					
+					if (count($where) > 0 && count($like) > 0)
+					{
+						$joins .= " AND ";
+					}
+
+					$joins .= implode("\n", $joinlike) . ")";					
 				}
 
 			}
 		}
-
 
 
 		if (count($where) > 0 OR count($like) > 0)
